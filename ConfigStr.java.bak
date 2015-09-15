@@ -1,0 +1,101 @@
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.File;
+
+
+public class ConfigStr {
+
+	public static void main(String[] args) {
+		
+		try {
+			int files = 12; //files個できる（seedの値は123から122+filesまで）
+			int i, j;
+			
+            String line;
+            String[] strAry;
+            String tmp = null;
+			
+			//コピー元
+            FileReader in = new FileReader(args[0]);
+            FileWriter[] out = new FileWriter[files];
+            BufferedReader br = new BufferedReader(in);
+            BufferedWriter[] bw = new BufferedWriter[files];
+            
+            //シェルスクリプト用　(MyBatch内のconfigを持ってきて実行)
+            FileWriter out2 = new FileWriter("path.txt");
+            BufferedWriter bw2 = new BufferedWriter(out2);
+            
+        	//MyBatchというファイルを作成
+        	String dirtmp =  "./MyBatch" ;
+        	File newfile = new File(dirtmp);
+            if (newfile.mkdir()){
+                System.out.println("ディレクトリの作成に成功しました");
+              }else{
+                //System.out.println("ディレクトリの作成に失敗しました（もう作成されているかも）");
+            }
+
+            for(i = 0; i < files; i++){
+                //seedの値のファイルを作成
+                dirtmp =  "./MyBatch/" + (123 + i);
+            	newfile = new File(dirtmp);
+                if (newfile.mkdir()){
+                    System.out.println("ディレクトリの作成に成功しました");
+                  }else{
+                    //System.out.println("ディレクトリの作成に失敗しました（もう作成されているかも）");
+                }
+            	
+                //複製先のファイルを作成
+            	String tmp2 = "./MyBatch/" + (123 + i) + "/test" + (123 + i) + ".config";
+            	bw2.write(tmp2);
+            	bw2.newLine();
+            	out[i] = new FileWriter(tmp2);
+            	bw[i] = new BufferedWriter(out[i]);
+            }
+
+            while ((line = br.readLine()) != null) {
+            	System.out.println(line);
+            	strAry = line.split(" ");
+                if(strAry[0].equals("seed")){
+                	//strAry = line.split(" ");
+                	for(i = 0; i < strAry.length - 1; i++){
+                		if(i == 0)
+                			tmp = strAry[i];
+                		else
+                			tmp += strAry[i];
+                		
+                		tmp += " ";
+                		//System.out.println(strAry[i]);
+                	}
+                	System.out.println(tmp);
+
+                	for(j = 0; j < files; j++)
+                		bw[j].write(tmp + (123 + j));
+                }
+                
+                else {
+                	for(j = 0; j < files; j++)
+                		bw[j].write(line);
+                }
+                
+                for(j = 0; j < files; j++)
+                	bw[j].newLine();
+            }
+
+            in.close();
+            for(j = 0; j < files; j++){
+            	bw[j].flush();
+                out[j].close();
+            }
+            
+            bw2.flush();
+            out2.close();
+        } catch (IOException e) {
+            System.out.println(e);
+        }
+
+	}
+
+}
